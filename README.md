@@ -11,7 +11,8 @@ Para clonar el repositorio y configurar el proyecto, sigue estos pasos:
 
    ```bash
    git clone https://github.com/Raquelcb24/impacta-back-php.git
-  ```
+   
+ 
    
 2. **Inicicializar en Xampp:**
 Es necesario tener iniciado en Xampp Apache y mysql para verificar que el proyecto funciona correctamente del lado del servidor.
