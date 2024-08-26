@@ -1,12 +1,18 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type");
 
-require 'db.php'; //necesito utilizar el documento donde tengo los datos de mi base de datos
+require 'db.php';
 
 // Obtengo los datos del formulario
 $data = json_decode(file_get_contents("php://input"));
 
+// Guardo los datos que recibo para ver si se están enviando correctamente
+file_put_contents('log.txt', print_r($data, true));
+
+// conpruebo si los datos están completos
 if (
   isset($data->name) &&
   isset($data->email) &&
@@ -21,16 +27,20 @@ if (
   $radio = isset($data->radio) ? $data->radio : '';
   $privacy = $data->privacy;
   
-//INSERT INTO  a mi db SQL 
-
+  // insert into a la base de datos
   $sql = "INSERT INTO formData (name, email, phone, planet, message, radio, privacy) VALUES (?, ?, ?, ?, ?, ?, ?)";
   $stmt = $conn->prepare($sql);
-  $stmt->bind_param("ssssssi", $name, $email, $phone, $planet, $message, $radio, $privacy); //ssssssi formatos de mis values (string, int)
+  if (!$stmt) {
+    echo json_encode(["success" => false, "message" => "Error en la preparación de la consulta: " . $conn->error]);
+    exit();
+  }
 
-  if ($stmt->execute()) { //ejecutar la consulta anterior
+  $stmt->bind_param("ssssssi", $name, $email, $phone, $planet, $message, $radio, $privacy);
+
+  if ($stmt->execute()) {
     echo json_encode(["success" => true]);
   } else {
-    echo json_encode(["success" => false]);
+    echo json_encode(["success" => false, "message" => "Error en la ejecución de la consulta: " . $stmt->error]);
   }
 
   $stmt->close();
